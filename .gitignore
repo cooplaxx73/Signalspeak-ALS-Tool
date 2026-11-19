@@ -12,3 +12,7 @@ desktop/face_landmarker.task
 desktop/device.json
 desktop/settings.json
 desktop/activity_log.db
+# Windows app build output (python build_exe.py)
+desktop/build/
+desktop/dist/
+desktop/startup.log
