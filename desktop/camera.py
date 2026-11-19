@@ -24,7 +24,12 @@ import mediapipe as mp
 import numpy as np
 from mediapipe.tasks.python import BaseOptions, vision
 
-MODEL_FILE = Path(__file__).parent / "face_landmarker.task"
+from paths import APP_FOLDER, BUNDLE_FOLDER
+
+# The Windows app ships with the model inside it. Run from source, the
+# model is downloaded next to the code on first run.
+BUNDLED_MODEL = BUNDLE_FOLDER / "face_landmarker.task"
+MODEL_FILE = BUNDLED_MODEL if BUNDLED_MODEL.exists() else APP_FOLDER / "face_landmarker.task"
 MODEL_URL = (
     "https://storage.googleapis.com/mediapipe-models/face_landmarker/"
     "face_landmarker/float16/1/face_landmarker.task"

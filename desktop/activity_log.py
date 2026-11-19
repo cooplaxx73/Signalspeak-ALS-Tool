@@ -17,7 +17,9 @@ import time
 import json
 from pathlib import Path
 
-LOG_FILE = Path(__file__).parent / "activity_log.db"
+from paths import APP_FOLDER
+
+LOG_FILE = APP_FOLDER / "activity_log.db"
 
 
 class ActivityLog:

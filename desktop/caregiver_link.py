@@ -10,7 +10,9 @@ from pathlib import Path
 import requests
 from PySide6.QtCore import QObject, Signal
 
-DEVICE_FILE = Path(__file__).parent / "device.json"
+from paths import APP_FOLDER
+
+DEVICE_FILE = APP_FOLDER / "device.json"
 
 class OfflineLink(QObject):
     """Stands in for CaregiverLink when this computer has not been paired.

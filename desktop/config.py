@@ -12,7 +12,9 @@ import json
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 
-FOLDER = Path(__file__).parent
+from paths import APP_FOLDER
+
+FOLDER = APP_FOLDER
 SETTINGS_FILE = FOLDER / "settings.json"
 
 
@@ -53,6 +55,9 @@ class Settings:
 
     # Caregiver backend (the stub server by default)
     backend_url: str = "http://127.0.0.1:8000"
+
+    # Windows app: has the "connect to your account" window been shown yet?
+    pairing_offered: bool = False
 
 
 def load_settings() -> Settings:
