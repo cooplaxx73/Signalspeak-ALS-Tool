@@ -2,59 +2,60 @@
 
 **Hands-free computer control for people with ALS, using an ordinary webcam.**
 
-SignalSpeak was built for the QEC 2026 ALS hackathon. ALS gradually takes away the ability to move, speak and type, and it does so differently in every person. Dedicated eye-tracking hardware exists, but it is expensive. SignalSpeak runs on a normal laptop with its built-in camera, and it adapts to the movements each person still has.
+Built for the QEC 2026 ALS hackathon.
 
-It has three parts that work together:
+**[⬇ Download for Windows](https://github.com/cooplaxx73/QEC---2026/releases/latest/download/SignalSpeak-windows.zip)** · [Quick start](#quick-start) · [Demo walkthrough](#demo-walkthrough) · [How it works](#how-it-works)
+
+---
+
+## What it is
+
+ALS gradually takes away the ability to move, speak and type, and it does so differently in every person. Dedicated eye-tracking hardware exists, but it is expensive. SignalSpeak runs on a normal laptop with its built-in camera, and it adapts to the movements each person still has.
+
+The patient looks at the screen to move the cursor and closes their eyes for half a second to click. A caregiver can adjust the settings from a phone dashboard as the disease progresses, and receives the patient's calls for help.
+
+SignalSpeak has three parts:
 
 | Part | Who uses it | What it does |
 |---|---|---|
-| **Desktop program** (`desktop/`) | The patient | Moves the cursor with the eyes or head, clicks with a face movement, types with an on-screen keyboard |
-| **Website** (`public/`) | Patient and caregiver | Accounts, sign-in, privacy consent, and linking a caregiver to a patient |
+| **Desktop app** (`desktop/`) | The patient | Moves the cursor with the eyes or head, clicks with a face movement, types with an on-screen keyboard |
+| **Website** (`public/`) | Patient and caregiver | Accounts, sign-in, privacy consent, linking a caregiver to a patient, and the app download |
 | **Phone dashboard** (`public/companion/`) | The caregiver | Changes the patient's settings remotely, receives calls for help, shows the activity log |
 
-A small server (`server.mjs`) connects them. Everything runs on one laptop for the demo.
+A small Node.js server (`server.mjs`) connects them. For the demo, everything runs on one laptop.
 
-## What makes it different
+## Features
 
-Most webcam tools assume one input: look at a target, then blink to click. SignalSpeak does not assume which movement a patient can make.
+- **Eye pointing.** Look where you want the cursor to go. A 13-dot calibration learns how your eyes map to the screen.
+- **Click with a held movement.** A half-second blink clicks, so normal blinking and reading never do. A short beep confirms each click.
+- **Ability test.** In about 95 seconds, the app asks for five face movements (close eyes, raise eyebrows, open mouth, smile, pucker lips) and four head turns. It scores each one for reliability, speed, accidental triggering and fatigue, then suggests the best click movement.
+- **Head pointing.** If the test shows good head movement, the cursor can follow the face instead of the eyes. A webcam measures head direction far more precisely than eye direction, so the cursor is steadier.
+- **Lean to zoom.** Leaning towards the screen enlarges the area around the cursor, so small targets are easy to hit.
+- **Minimal overlay.** Only four large buttons stay on screen: Call Caregiver, Keyboard, Settings and Notifications.
+- **Dark-room help.** If the camera picture gets too dark, the screen brightens and a white border lights the face.
+- **Caregiver control with consent.** The patient approves each caregiver, can revoke access at any time, and decides whether activity is logged.
+- **Two logs.** A progression log helps track motor changes over months. An audit log records every caregiver change.
+- **The mouse always wins.** A helper can move the real mouse at any time and eye control lets go. F8 pauses, F9 quits.
 
-- **Ability test.** In about 95 seconds, the program asks for five face movements (close eyes, raise eyebrows, open mouth, smile, pucker lips) and four head turns. It scores each on whether it happened, how strong and fast it was, whether it fires by accident during other movements, and whether it tires. The patient then clicks with the most reliable one.
-- **Eye or head pointing.** If the test shows good head movement, the cursor can follow the direction of the face instead of the eyes. A webcam measures head direction far more precisely than eye direction, so the cursor is steadier.
-- **It follows the disease.** The test can be repeated at any time, by the patient or remotely by a caregiver. Scores go in a progression log, so changes over months are visible.
-- **Lean to zoom.** Leaning towards the screen enlarges the area around the cursor, which makes small targets easy to hit.
-- **The mouse always wins.** A helper can move the real mouse at any time and eye control lets go.
+## Quick start
 
-## How it works
+Choose the setup that matches what you want to do.
 
-1. **Seeing the face.** Each webcam frame goes through Google's MediaPipe Face Landmarker [1], [2]. It returns 478 points on the face [3], including the centre of each iris, plus 52 scores for facial movements (such as "left eye closed") and a matrix giving the direction of the head.
-2. **Calibration.** The patient looks at (or points their nose at) 13 dots. For each dot the program records ten numbers describing the eyes and head. A ridge regression [4], which is a line fit that resists noise, learns how those numbers map to a position on the screen. The fit is checked by hiding one dot at a time and predicting it.
-3. **Moving the cursor.** Each new frame gives a predicted screen position. A filter holds the cursor steady while the patient rests on a spot and lets it jump quickly when they look elsewhere. The cursor is then glided to that position about 120 times a second.
-4. **Clicking.** The chosen movement must be held briefly. For a blink that is about half a second, so normal blinks never click. The click lands where the patient was looking just before the movement began.
-5. **Staying connected.** The desktop is paired once with the patient's account. It then loads saved settings from the server, receives changes from the caregiver, and sends calls for help.
+### A. Try the desktop app (Windows, no setup)
 
-The details of each file are in [`desktop/README.md`](desktop/README.md).
+Needs Windows 10 or 11 and a webcam.
 
-## Setup
+1. Download **[SignalSpeak-windows.zip](https://github.com/cooplaxx73/QEC---2026/releases/latest/download/SignalSpeak-windows.zip)** (about 165 MB) and unzip it.
+2. Open the `SignalSpeak` folder and double-click **SignalSpeak.exe**. Keep the folder together; the app needs its `_internal` folder.
+3. If Windows shows "Windows protected your PC", choose **More info → Run anyway**. The prototype is not code-signed.
+4. On first launch, choose **Use offline** (or sign in, see B).
+5. Look at each dot to calibrate. Then look to move the cursor and close both eyes for half a second to click.
 
-### 1. Patient program only (no accounts)
+Offline, nothing leaves the computer. Settings, the activity log and pairing are saved in the app folder.
 
-This is enough to try eye control, the keyboard and the ability test. Requires Python 3.11 and a webcam.
+### B. Full system with accounts and caregiver dashboard
 
-```sh
-cd desktop
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python main.py
-```
-
-On macOS/Linux, activate with `source .venv/bin/activate`. The first run downloads the face model (about 4 MB). Unpaired, the program works by itself and nothing leaves the computer.
-
-Press **F8** to pause eye control and **F9** to quit.
-
-### 2. Full system (accounts, caregiver dashboard)
-
-Requires Node.js 22 or newer [12]. There are no Node packages to install.
+Needs [Node.js 22 or newer](https://nodejs.org) [12]. There are no Node packages to install.
 
 ```sh
 node scripts/package-desktop.mjs
@@ -62,31 +63,63 @@ node server.mjs
 ```
 
 - Website: http://localhost:3000
-- Phone dashboard (browser demo): http://localhost:3000/app/
+- Phone dashboard (shown in the laptop's browser): http://localhost:3000/app/
 
-The server only listens on this computer. A real phone cannot reach it through `localhost`; the dashboard is shown in the laptop's browser for the demo. Use fictional information only.
+Create a patient account on the website, then start **SignalSpeak.exe** and sign in with it in the "Connect to your account" window. The server address is already filled in (`http://127.0.0.1:3000`). Your password is used once and not saved; the app keeps a device token in `device.json`.
 
-Then pair the desktop with the patient account, once:
+To pair later, or with a different account, double-click **Pair with account.bat** in the app folder. Keep the server running while you use the caregiver features.
+
+`package-desktop.mjs` builds the optional Python source ZIP offered on the website's Download page.
+
+### C. Run the desktop app from Python source
+
+For development, or on macOS and Linux. Needs Python 3.11 (MediaPipe does not support every newer version) and a webcam.
 
 ```sh
 cd desktop
-python connect.py
+python -m venv .venv
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+python connect.py               # optional: pair with a patient account
 python main.py
 ```
 
-`connect.py` asks for the server address, patient email and password. It saves a device token in `desktop/device.json` (ignored by Git), not the password.
+The first run downloads the face model (about 4 MB). To try the overlay with a normal mouse, without a webcam or server, run `python preview_overlay.py`.
 
-### End-to-end walkthrough
+## Demo walkthrough
 
-1. On the website, create a patient account. Accept the privacy notice and choose whether to enable activity logging.
-2. Copy the patient ID. Sign out, create a caregiver account, and request a connection using that ID.
-3. Sign back in as the patient and accept the connection in My account.
-4. To be signed in as both at once, use a second browser profile or a private window.
-5. Pair and start the desktop program. Calibrate by looking at the dots.
-6. Open Settings on the desktop, then the Ability test tab, and run the test. Choose the suggested click movement and pointing method.
-7. Open `/app/` as the caregiver and select the patient. The patient's choices appear there. Change a setting, or press "Run ability test on desktop".
-8. On the desktop, use the phone button to call the caregiver. The request appears in the dashboard.
+1. Start the server (setup B) and open the website.
+2. Create a patient account. Accept the privacy notice and choose whether to enable activity logging.
+3. Copy the patient ID from My account. Sign out, create a caregiver account and request a connection with that ID.
+4. Sign back in as the patient and accept the connection. To be signed in as both at once, use a private window for one of them.
+5. Download and start the desktop app, sign in as the patient, and calibrate by looking at the dots.
+6. Open **Settings → Ability test** on the desktop and run the test. Choose the suggested click movement and pointing method.
+7. Open `/app/` as the caregiver and select the patient. Change a setting, or press **Run ability test on desktop**. The desktop announces each change.
+8. On the desktop, press the phone button to call the caregiver. The request appears in the dashboard.
 9. Revoke the connection on the website to remove the caregiver's access.
+
+## Controls
+
+| Action | How |
+|---|---|
+| Move the cursor | Look where you want it to go, or turn your head if head pointing is on |
+| Click | Close both eyes for about half a second, or use the movement the ability test chose |
+| Zoom | Look at a target and lean towards the screen. Sit back, then click in the zoomed view |
+| Type | Press the keyboard button and use the on-screen keyboard |
+| Call for help | Press the phone button |
+| Pause eye control | F8 (for a helper) |
+| Use the real mouse | Just move it. Eye control returns 2 seconds after the mouse stops |
+| Quit | F9, or Settings → Turn off |
+
+## How it works
+
+1. **Seeing the face.** Each webcam frame goes through Google's MediaPipe Face Landmarker [1], [2]. It returns 478 points on the face [3], including the centre of each iris, plus 52 scores for facial movements (such as "left eye closed") and a matrix giving the direction of the head.
+2. **Calibration.** The patient looks at (or points their nose at) 13 dots. For each dot the program records ten numbers describing the eyes and head. A ridge regression [4], which is a line fit that resists noise, learns how those numbers map to a position on the screen. The fit is checked by hiding one dot at a time and predicting it.
+3. **Moving the cursor.** Each new frame gives a predicted screen position. A filter holds the cursor steady while the patient rests on a spot and lets it jump quickly when they look elsewhere. The cursor then glides to that position about 120 times a second.
+4. **Clicking.** The chosen movement must be held briefly. For a blink that is about half a second, so normal blinks never click. The click lands where the patient was looking just before the movement began.
+5. **Staying connected.** The desktop is paired once with the patient's account. It then loads saved settings from the server, receives changes from the caregiver, and sends calls for help.
+
+File-by-file details are in [`desktop/README.md`](desktop/README.md).
 
 ## Privacy and data
 
@@ -94,11 +127,21 @@ python main.py
 - Activity logging is off unless the patient turns it on. Only the patient can change this.
 - With logging on, the log holds action types, timings, estimated gaze samples and click positions. It never holds typed text, screenshots or video.
 - Every settings change is recorded in an audit log under the account that made it.
-- Passwords are stored as salted scrypt hashes. The desktop authenticates with a separate token, never the password.
+- Passwords are stored as salted scrypt hashes. The desktop authenticates with a separate device token, never the password.
 - The integrated demo does not transmit video or audio.
 - Accounts and care data are stored in a local `data/` folder, which Git ignores.
 
-## Tests
+## Project status
+
+**Working:** the Windows app download, accounts and sign-in, consent, caregiver linking and revocation, desktop pairing, remote settings, eye and head pointing, click by blink or another movement, the ability test, lean-to-zoom, on-screen keyboard, automatic screen brightness in dark rooms, activity log with charts and export, and calls for help.
+
+**Not done:** video and audio calls (switched off), a code-signed installer, a macOS app, real-phone networking over HTTPS, production-grade identity, and account deletion.
+
+**Known limits:** webcam eye tracking is accurate to roughly 3 to 7% of the screen width, which is why targets are large and zoom exists. Accuracy depends on lighting and on the laptop's camera. Head pointing needs neck movement. This is a prototype and not a medical device.
+
+## Development
+
+### Tests
 
 ```sh
 node --test
@@ -108,19 +151,22 @@ python -m unittest discover -s tests -v
 
 The Python tests use made-up face data, so they need no camera.
 
-## Status
+### Building the Windows app
 
-**Working:** accounts and sign-in, consent, caregiver linking and revocation, desktop pairing, remote settings, eye and head pointing, click by blink or another movement, the ability test, lean-to-zoom, on-screen keyboard, automatic screen brightness in dark rooms, activity log with charts and export, calls for help.
+From `desktop/`, inside the virtual environment (setup C):
 
-**Not done:** video and audio calls (switched off), a packaged installer, real-phone networking over HTTPS, production-grade identity, account deletion.
+```sh
+pip install pyinstaller
+python build_exe.py
+```
 
-**Known limits:** webcam eye tracking is accurate to roughly 3 to 7% of the screen width, which is why targets are large and zoom exists. Accuracy depends on lighting and on the laptop's camera. Head pointing needs neck movement. This is a prototype and not a medical device.
+This creates `desktop/dist/SignalSpeak-windows.zip` with `SignalSpeak.exe`, the face model built in, a **Pair with account.bat** shortcut and a short READ ME. The recipe is in `desktop/signalspeak.spec`. Upload the zip to a GitHub release so the Download links keep working.
 
-## Repository layout
+### Repository layout
 
 | Path | Contents |
 |---|---|
-| `desktop/` | The patient program (Python) and its tests |
+| `desktop/` | The patient app (Python), its tests and the Windows build recipe |
 | `public/` | The website |
 | `public/companion/` | The phone dashboard |
 | `server.mjs`, `care-api.mjs`, `telemetry.mjs` | The account and care server (Node.js) |
@@ -153,9 +199,11 @@ The Python tests use made-up face data, so they need no camera.
 
 [12] OpenJS Foundation. *Node.js* [Software]. https://nodejs.org
 
-OpenCV [5] reads the webcam, NumPy [6] does the calibration maths, PySide6 [7] draws the windows, pynput [8] sends clicks and key presses, pyttsx3 [9] reads text aloud, screen-brightness-control [10] adjusts brightness, and Requests [11] talks to the server.
+[13] PyInstaller Development Team. *PyInstaller* [Software, GPL with bootloader exception]. https://pyinstaller.org
 
-## Attribution
+OpenCV [5] reads the webcam, NumPy [6] does the calibration maths, PySide6 [7] draws the windows, pynput [8] sends clicks and key presses, pyttsx3 [9] reads text aloud, screen-brightness-control [10] adjusts brightness, Requests [11] talks to the server, and PyInstaller [13] packages the Windows app.
+
+## Team and attribution
 
 Original phone interface: teammate's `app` branch. Original eye tracking and desktop program: teammate's `action-implementation` branch. Website and integration: `web` and `codex/integrated-demo` branches. Each source file names the libraries it uses and the AI assistance involved.
 

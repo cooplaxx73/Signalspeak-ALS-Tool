@@ -19,7 +19,9 @@ Four icon buttons stay on screen: **Call Caregiver** (phone), **Keyboard**, **Se
 
 ## Setup
 
-Requires Python 3.11 and a webcam.
+**Most people:** download the Windows app instead of setting up Python. See [Quick start A and B](../README.md#quick-start) in the main README. On first launch it offers to connect to a patient account; `Pair with account.bat` shows that window again.
+
+**From source** (development, macOS or Linux): requires Python 3.11 and a webcam.
 
 **Without an account:** skip `python connect.py` below. The program then runs by itself: eye control, clicking, the keyboard and the ability test all work, the progression log stays on this computer, and nothing is sent anywhere.
 
@@ -39,7 +41,7 @@ On macOS/Linux, activate with `source .venv/bin/activate` instead. `connect.py` 
 
 After the environment setup is complete, Windows users can double-click **Start SignalSpeak.vbs** instead of opening a terminal. It uses the virtual environment's windowed Python. Launch failures are written to `startup.log` and shown in a message box. When paired, keep the central server running.
 
-The first launch downloads the MediaPipe face model (about 4 MB). This source package is not a standalone installer.
+The first launch downloads the MediaPipe face model (about 4 MB). The Windows app has the model built in.
 
 To try the overlay layout with a mouse, without a webcam or server:
 
@@ -78,7 +80,9 @@ F8/F9 and real-mouse takeover are helper controls; do not use them to operate th
 | File | Job |
 |---|---|
 | `main.py` | Starts everything and passes data between the parts |
-| `connect.py` | Pairs this computer with a patient account (run once) |
+| `connect.py` | Pairs this computer with a patient account (terminal version) |
+| `pairing_window.py` | The "Connect to your account" window in the Windows app |
+| `paths.py` | Where settings, logs and pairing are saved (next to the .exe in the Windows app) |
 | `launch.pyw`, `Start SignalSpeak.vbs` | Start the program on Windows without a terminal |
 | `config.py` | Every tunable setting, in one place |
 | `camera.py` | Webcam capture and face landmark tracking |
@@ -96,6 +100,7 @@ F8/F9 and real-mouse takeover are helper controls; do not use them to operate th
 | `caregiver_link.py` | Talks to the care server with the paired device token |
 | `video_call.py` | Corner video window. Video is switched off in the integrated demo |
 | `preview_overlay.py` | Mouse-only preview of the overlay |
+| `build_exe.py`, `signalspeak.spec` | Build the Windows app (`python build_exe.py`) |
 | `stub_server.py`, `caregiver_test_page.html` | From the original stand-alone desktop test setup. Not used by the integrated program |
 
 ## Checks
@@ -124,3 +129,4 @@ Webcam calibration and actual eye-only use must be tested on the demonstration l
 - pyttsx3 (MPL 2.0): https://pyttsx3.readthedocs.io
 - screen-brightness-control (MIT): https://github.com/Crozzers/screen_brightness_control
 - Requests (Apache 2.0): https://requests.readthedocs.io
+- PyInstaller (GPL with bootloader exception), builds the Windows app: https://pyinstaller.org
