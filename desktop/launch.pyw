@@ -1,18 +1,24 @@
-"""Windowed entry point for the Windows shortcut. No console is required.
+"""Windowed entry point. No console window is needed.
+
+Used by "Start SignalSpeak.vbs" (run from source) and as the entry point of
+the Windows app, SignalSpeak.exe (see signalspeak.spec).
 
 Integration assistance: OpenAI Codex. Uses Python's standard library.
+Windows app support added with the assistance of Claude Code (Anthropic).
 """
 import ctypes
 from ctypes import wintypes
 import os
 from pathlib import Path
-import runpy
 import sys
 import traceback
 
-folder = Path(__file__).resolve().parent
+if getattr(sys, "frozen", False):
+    folder = Path(sys.executable).resolve().parent   # next to SignalSpeak.exe
+else:
+    folder = Path(__file__).resolve().parent
+    sys.path.insert(0, str(folder))
 os.chdir(folder)
-sys.path.insert(0, str(folder))
 
 
 def show_error(message):
@@ -33,11 +39,14 @@ def main():
             sys.stdout = log
             sys.stderr = log
             try:
-                runpy.run_path(str(folder / 'main.py'), run_name='__main__')
+                import main as signalspeak
+                signalspeak.main()
+            except SystemExit:
+                pass  # normal quit
             except Exception:
                 traceback.print_exc(file=log)
                 log.flush()
-                show_error('SignalSpeak could not start. Details were saved in startup.log in the app folder.\n\nMake sure setup and patient pairing have been completed.')
+                show_error('SignalSpeak could not start. Details were saved in startup.log in the app folder.\n\nCheck that a webcam is connected and not in use by another app.')
     finally:
         if handle:
             ctypes.windll.kernel32.CloseHandle(handle)

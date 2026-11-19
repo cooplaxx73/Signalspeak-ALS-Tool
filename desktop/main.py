@@ -46,6 +46,8 @@ from keyboard import OnScreenKeyboard
 from lighting import LowLightHelper
 from overlay import (INSTRUCTIONS, ButtonBar, ChoicePopup, IncomingCallPopup,
                      NotificationsPanel, SettingsPanel, Toast)
+from pairing_window import ask_to_pair
+from paths import RUNNING_AS_EXE
 from speech import Speaker
 from telemetry import GazeSampler
 from video_call import VideoWindow, frame_to_jpeg
@@ -684,9 +686,26 @@ class EyeControl(QObject):
         self.link.stop()
 
 
+def offer_pairing() -> None:
+    """Windows app only: on first launch (or with --pair), offer to connect
+    this computer to a patient account. Run from source, use connect.py."""
+    wants_pairing = "--pair" in sys.argv
+    settings = load_settings()
+    if not RUNNING_AS_EXE and not wants_pairing:
+        return
+    if DEVICE_FILE.exists() and not wants_pairing:
+        return
+    if settings.pairing_offered and not wants_pairing:
+        return
+    ask_to_pair()
+    settings.pairing_offered = True
+    save_settings(settings)
+
+
 def main() -> None:
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
+    offer_pairing()
     control = EyeControl(app)
     app.aboutToQuit.connect(control.shut_down)
     sys.exit(app.exec())
