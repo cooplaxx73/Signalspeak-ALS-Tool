@@ -43,7 +43,7 @@ If Windows shows "Windows protected your PC", choose More info > Run anyway.
 The app is not code-signed because it is a student prototype.
 
 Your settings, activity log and pairing are saved in this folder.
-Full documentation: https://github.com/cooplaxx73/QEC---2026
+Full documentation: https://github.com/cooplaxx73/Signalspeak-ALS-Tool
 """
 
 

@@ -4,7 +4,7 @@
 
 Built for the QEC 2026 ALS hackathon.
 
-**[⬇ Download for Windows](https://github.com/cooplaxx73/QEC---2026/releases/latest/download/SignalSpeak-windows.zip)** · [Quick start](#quick-start) · [Demo walkthrough](#demo-walkthrough) · [How it works](#how-it-works)
+**[⬇ Download for Windows](https://github.com/cooplaxx73/Signalspeak-ALS-Tool/releases/latest/download/SignalSpeak-windows.zip)** · [Quick start](#quick-start) · [Demo walkthrough](#demo-walkthrough) · [How it works](#how-it-works)
 
 ---
 
@@ -45,7 +45,7 @@ Choose the setup that matches what you want to do.
 
 Needs Windows 10 or 11 and a webcam.
 
-1. Download **[SignalSpeak-windows.zip](https://github.com/cooplaxx73/QEC---2026/releases/latest/download/SignalSpeak-windows.zip)** (about 165 MB) and unzip it.
+1. Download **[SignalSpeak-windows.zip](https://github.com/cooplaxx73/Signalspeak-ALS-Tool/releases/latest/download/SignalSpeak-windows.zip)** (about 165 MB) and unzip it.
 2. Open the `SignalSpeak` folder and double-click **SignalSpeak.exe**. Keep the folder together; the app needs its `_internal` folder.
 3. If Windows shows "Windows protected your PC", choose **More info → Run anyway**. The prototype is not code-signed.
 4. On first launch, choose **Use offline** (or sign in, see B).
